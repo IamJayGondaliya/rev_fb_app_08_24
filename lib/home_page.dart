@@ -50,104 +50,55 @@ class HomePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView.builder(
-          itemCount: mutable.users.length,
-          itemBuilder: (c, i) {
-            UserModel user = mutable.users[i];
-
-            return Card(
-              child: Slidable(
-                endActionPane: ActionPane(
-                  motion: const ScrollMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (context) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text("Edit User !!"),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextFormField(
-                                  initialValue: user.id,
-                                  onChanged: (val) => user.id = val,
-                                ),
-                                TextFormField(
-                                  initialValue: user.name,
-                                  onChanged: (val) => user.name = val,
-                                ),
-                                TextFormField(
-                                  initialValue: user.age,
-                                  onChanged: (val) => user.age = val,
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  immutable.editUser(userModel: user).then(
-                                        (value) => Navigator.pop(context),
-                                      );
-                                },
-                                child: const Text("UPDATE"),
-                              ),
-                              OutlinedButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("Cancel"),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      icon: Icons.edit,
-                      foregroundColor: Colors.blue,
-                    ),
-                    SlidableAction(
-                      onPressed: (context) {
-                        immutable.deleteUser(userModel: user);
-                      },
-                      icon: Icons.delete,
-                      foregroundColor: Colors.red,
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                  onLongPress: () {},
-                  leading: Text(user.id),
-                  title: Text(user.name),
-                  trailing: Text(user.age),
-                ),
+          itemCount: mutable.myFriends.length,
+          itemBuilder: (c, i) => ListTile(
+            leading: CircleAvatar(
+              foregroundImage: NetworkImage(
+                mutable.myFriends[i].photoUrl,
               ),
-            );
-          },
+            ),
+            title: Text(mutable.myFriends[i].displayName),
+            subtitle: Text(mutable.myFriends[i].email),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          UserModel user = UserModel("000", "DEMO", "00");
-
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text("Add User !!"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    onChanged: (val) => user.name = val,
+              title: const Text("Add Friend !!"),
+              content: SizedBox(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: mutable.allUsers
+                        .where((element) =>
+                            element.uid !=
+                            (FirebaseAuth.instance.currentUser?.uid ?? ""))
+                        .map(
+                          (e) => ListTile(
+                            leading: CircleAvatar(
+                              foregroundImage: NetworkImage(e.photoUrl),
+                            ),
+                            title: Text(e.displayName),
+                            trailing: IconButton(
+                              onPressed: () {
+                                immutable
+                                    .addFriend(friend: e)
+                                    .then((value) => Navigator.pop(context));
+                              },
+                              icon: const Icon(Icons.person_add_alt),
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
-                  TextField(
-                    onChanged: (val) => user.age = val,
-                  ),
-                ],
+                ),
               ),
               actions: [
                 ElevatedButton(
-                  onPressed: () {
-                    immutable.addUser(userModel: user).then(
-                          (value) => Navigator.pop(context),
-                        );
-                  },
+                  onPressed: () {},
                   child: const Text("Add"),
                 ),
                 OutlinedButton(

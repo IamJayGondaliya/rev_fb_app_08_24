@@ -3,12 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 import 'package:rev_fb_app/extensions.dart';
+import 'package:rev_fb_app/helpers/firestore_helper.dart';
 
 class SignInPage extends StatelessWidget {
   SignInPage({super.key});
 
   final TextEditingController email = TextEditingController();
   final TextEditingController psw = TextEditingController();
+
+  void navigate(BuildContext context) {
+    FireStoreHelper.instance.addCurrentUser().then(
+          (value) => Navigator.pushReplacementNamed(context, 'home_page'),
+        );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +60,7 @@ class SignInPage extends StatelessWidget {
                             password: psw.text,
                           )
                           .then(
-                            (value) => Navigator.pushReplacementNamed(
-                              context,
-                              'home_page',
-                            ),
+                            (value) => navigate(context),
                           )
                           .onError(
                             (error, stackTrace) => Logger().e("ERROR: $error"),
@@ -72,7 +76,7 @@ class SignInPage extends StatelessWidget {
                   FirebaseAuth.instance.signInAnonymously().then((value) {
                     Logger()
                         .i("LOG IN: ${FirebaseAuth.instance.currentUser?.uid}");
-                    Navigator.of(context).pushReplacementNamed('home_page');
+                    navigate(context);
                   }).onError(
                     (error, stackTrace) {
                       Logger().e("ERROR: $error");
@@ -102,7 +106,7 @@ class SignInPage extends StatelessWidget {
                       .then((value) {
                     Logger()
                         .i("LOG IN: ${FirebaseAuth.instance.currentUser?.uid}");
-                    Navigator.of(context).pushReplacementNamed('home_page');
+                    navigate(context);
                   }).onError(
                     (error, stackTrace) {
                       Logger().e("ERROR: $error");

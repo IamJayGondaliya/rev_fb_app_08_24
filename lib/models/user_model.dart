@@ -15,3 +15,26 @@ class UserModel {
         'age': age,
       };
 }
+
+class FbUserModel {
+  String uid, displayName, photoUrl, email, phoneNumber;
+
+  FbUserModel(
+      this.uid, this.displayName, this.photoUrl, this.email, this.phoneNumber);
+
+  factory FbUserModel.fromMap(Map data) => FbUserModel(
+        data['uid'],
+        data['displayName'],
+        data['photoUrl'],
+        data['email'],
+        data['phoneNumber'],
+      );
+
+  Map<String, dynamic> get toMap => {
+        'uid': uid,
+        'displayName': displayName,
+        'photoUrl': photoUrl,
+        'email': email,
+        'phoneNumber': phoneNumber,
+      };
+}

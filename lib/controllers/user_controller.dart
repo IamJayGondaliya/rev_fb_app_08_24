@@ -4,13 +4,22 @@ import 'package:rev_fb_app/models/user_model.dart';
 
 class UserController extends ChangeNotifier {
   List<UserModel> users = [];
+  List<FbUserModel> allUsers = [];
+  List<FbUserModel> myFriends = [];
 
   UserController() {
     init();
   }
 
   Future<void> init() async {
-    users = await FireStoreHelper.instance.getData();
+    allUsers = await FireStoreHelper.instance.getAllUsers();
+    myFriends = await FireStoreHelper.instance.getMyFriends();
+    notifyListeners();
+  }
+
+  Future<void> addFriend({required FbUserModel friend}) async {
+    await FireStoreHelper.instance.addFriend(friend: friend);
+    await init();
     notifyListeners();
   }
 
