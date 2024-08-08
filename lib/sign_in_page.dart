@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
+import 'package:rev_fb_app/controllers/user_controller.dart';
 import 'package:rev_fb_app/extensions.dart';
 import 'package:rev_fb_app/helpers/firestore_helper.dart';
 
@@ -13,8 +15,11 @@ class SignInPage extends StatelessWidget {
 
   void navigate(BuildContext context) {
     FireStoreHelper.instance.addCurrentUser().then(
-          (value) => Navigator.pushReplacementNamed(context, 'home_page'),
-        );
+      (value) async {
+        await Provider.of<UserController>(context, listen: false).init();
+        return Navigator.pushReplacementNamed(context, 'home_page');
+      },
+    );
   }
 
   @override

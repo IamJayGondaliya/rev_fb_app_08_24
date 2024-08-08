@@ -51,14 +51,24 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: ListView.builder(
           itemCount: mutable.myFriends.length,
-          itemBuilder: (c, i) => ListTile(
-            leading: CircleAvatar(
-              foregroundImage: NetworkImage(
-                mutable.myFriends[i].photoUrl,
+          itemBuilder: (c, i) => Card(
+            child: ListTile(
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  'chat_page',
+                  arguments: mutable.myFriends[i],
+                );
+              },
+              isThreeLine: true,
+              leading: CircleAvatar(
+                foregroundImage: NetworkImage(
+                  mutable.myFriends[i].photoUrl,
+                ),
               ),
+              title: Text(mutable.myFriends[i].displayName),
+              subtitle: Text(
+                  "${mutable.myFriends[i].email}\n${mutable.myFriends[i].uid}"),
             ),
-            title: Text(mutable.myFriends[i].displayName),
-            subtitle: Text(mutable.myFriends[i].email),
           ),
         ),
       ),
@@ -73,20 +83,28 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: mutable.allUsers
-                        .where((element) =>
-                            element.uid !=
-                            (FirebaseAuth.instance.currentUser?.uid ?? ""))
+                        .where(
+                          (otherUser) {
+                            bool notCurrentUser = otherUser.uid !=
+                                (FirebaseAuth.instance.currentUser?.uid ?? "");
+
+                            bool notFriend = mutable.myFriends
+                                .every((ele) => ele.uid != otherUser.uid);
+
+                            return notCurrentUser && notFriend;
+                          },
+                        )
                         .map(
                           (e) => ListTile(
                             leading: CircleAvatar(
                               foregroundImage: NetworkImage(e.photoUrl),
                             ),
-                            title: Text(e.displayName),
+                            title: Text(e.email),
                             trailing: IconButton(
                               onPressed: () {
-                                immutable
-                                    .addFriend(friend: e)
-                                    .then((value) => Navigator.pop(context));
+                                immutable.addFriend(friend: e).then(
+                                      (value) => Navigator.pop(context),
+                                    );
                               },
                               icon: const Icon(Icons.person_add_alt),
                             ),

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rev_fb_app/chat_page.dart';
 import 'package:rev_fb_app/controllers/user_controller.dart';
 import 'package:rev_fb_app/home_page.dart';
 import 'package:rev_fb_app/sign_in_page.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => SignInPage(),
         'home_page': (context) => const HomePage(),
+        'chat_page': (context) => ChatPage(),
       },
     );
   }

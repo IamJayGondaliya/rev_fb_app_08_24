@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:rev_fb_app/models/chat_model.dart';
 import 'package:rev_fb_app/models/user_model.dart';
 
 class FireStoreHelper {
@@ -119,5 +120,45 @@ class FireStoreHelper {
     return snapshot.docs
         .map((e) => FbUserModel.fromMap(e.data() as Map))
         .toList();
+  }
+
+  Future<void> sendMsg({
+    required ChatModel chat,
+    required FbUserModel friend,
+  }) async {
+    User user = FirebaseAuth.instance.currentUser!;
+
+    await fireStore
+        .collection('allUsers')
+        .doc(user.uid)
+        .collection('friends')
+        .doc(friend.uid)
+        .collection('chats')
+        .doc(chat.time)
+        .set(chat.toJson);
+
+    Map<String, dynamic> data = chat.toJson;
+    data['type'] = "received";
+
+    await fireStore
+        .collection('allUsers')
+        .doc(friend.uid)
+        .collection('friends')
+        .doc(user.uid)
+        .collection('chats')
+        .doc(chat.time)
+        .set(data);
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getMsg(
+      {required FbUserModel friend}) {
+    User user = FirebaseAuth.instance.currentUser!;
+    return fireStore
+        .collection('allUsers')
+        .doc(user.uid)
+        .collection('friends')
+        .doc(friend.uid)
+        .collection('chats')
+        .snapshots();
   }
 }
